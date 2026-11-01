@@ -27,14 +27,14 @@ object NetworkModule {
         redactHeader("Authorization")        // Logcat 에 토큰이 찍히지 않게
     }
 
-    // [TODO 4] AuthInterceptor 와 TokenAuthenticator 를 OkHttpClient 에 붙인다.
-    //          순서: .addInterceptor(authInterceptor).authenticator(authenticator).addInterceptor(logging())
-    //          (헤더를 붙인 뒤 로깅해야 Logcat 에서 Authorization 헤더가 가려진 채로 보인다)
+    // [정답 4] Interceptor 순서 = 추가한 순서. Authenticator 는 401 에만 호출된다.
     @Provides @Singleton
     fun provideOkHttp(
         authInterceptor: AuthInterceptor,
         authenticator: TokenAuthenticator,
     ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(authInterceptor)
+        .authenticator(authenticator)
         .addInterceptor(logging())
         .build()
 
