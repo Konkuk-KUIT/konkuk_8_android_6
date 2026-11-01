@@ -65,6 +65,6 @@ com/kuit/week6/
 - 로그인은 되는데 내 정보가 401 → TODO 2 에서 헤더를 안 붙였거나, `Bearer ` 뒤 공백 누락
 - 토큰 망가뜨린 뒤 새로고침이 401 로 끝남 → TODO 3 에서 새 Request 대신 null 을 반환하고 있음, 또는 OkHttp 에 `.authenticator()` 누락 (TODO 4)
 - 401 이 두 번 연속 찍히고 멈춤 → 정상. `priorResponse` 가드가 두 번째를 막은 것. refresh 가 실패했는지 로그 확인
-- `NotImplementedError` → TokenStore 의 `TODO()` 가 남아 있음
+- 로그인은 200 인데 내 정보가 401 (헤더 없음) → TODO 1 의 `flowOf(null)` 이 그대로 남아 있음. 시작 코드는 원래 이 상태다
 - Logcat 에 `Authorization: ██` 로 보임 → 정상. `redactHeader` 가 가린 것
 - `preferencesDataStore` 를 두 파일에서 선언 → 같은 이름이면 크래시. 파일 하나(TokenStore)에만

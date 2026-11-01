@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -23,16 +24,16 @@ class TokenStore @Inject constructor(
     private val REFRESH = stringPreferencesKey("refresh")
 
     // [TODO 1-a] 읽기는 Flow. context.dataStore.data 를 map 해서 키의 값을 꺼낸다.
-    val accessToken: Flow<String?> = TODO("context.dataStore.data.map { it[ACCESS] }")
-    val refreshToken: Flow<String?> = TODO()
+    //            힌트: context.dataStore.data.map { it[ACCESS] }
+    //            (flowOf(null) 은 "토큰 없음" 을 흘려보내는 임시값. 지금은 로그인해도 저장되지 않는다)
+    val accessToken: Flow<String?> = flowOf(null)
+    val refreshToken: Flow<String?> = flowOf(null)
 
     // [TODO 1-b] 쓰기는 suspend. context.dataStore.edit { } 안에서 두 키를 넣는다.
     suspend fun save(access: String, refresh: String) {
-        TODO()
     }
 
     // [TODO 1-c] 로그아웃: edit { it.clear() }
     suspend fun clear() {
-        TODO()
     }
 }
