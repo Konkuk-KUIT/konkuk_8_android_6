@@ -32,7 +32,7 @@ class LoginViewModel @Inject constructor(
         _state.update { it.copy(isLoading = true, error = null) }
         try {
             login(username, password)
-            _state.update { it.copy(isLoading = false, success = true) }
+            _state.update { it.copy(isLoading = false) }
         } catch (e: CancellationException) {
             throw e
         } catch (e: HttpException) {
