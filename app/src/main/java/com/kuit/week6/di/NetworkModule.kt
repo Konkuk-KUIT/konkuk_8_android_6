@@ -4,6 +4,7 @@ import com.kuit.week6.BuildConfig
 import com.kuit.week6.data.auth.AuthInterceptor
 import com.kuit.week6.data.auth.AuthService
 import com.kuit.week6.data.auth.TokenAuthenticator
+import com.kuit.week6.data.product.ProductService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,4 +50,7 @@ object NetworkModule {
 
     @Provides
     fun provideAuthService(retrofit: Retrofit): AuthService = retrofit.create(AuthService::class.java)
+
+    @Provides
+    fun provideProductService(retrofit: Retrofit): ProductService = retrofit.create(ProductService::class.java)
 }
