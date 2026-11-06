@@ -32,10 +32,7 @@ class ProfileViewModel @Inject constructor(
                 breakAccessToken()
                 _state.update { it.copy(lastEvent = "Access 토큰을 'broken' 으로 바꿨다. 새로고침하면 401 → 재발급 → 재시도가 일어나야 한다") }
             }
-            ProfileIntent.Logout -> viewModelScope.launch {
-                logout()
-                _state.update { it.copy(loggedOut = true) }
-            }
+            ProfileIntent.Logout -> viewModelScope.launch { logout() }
         }
     }
 

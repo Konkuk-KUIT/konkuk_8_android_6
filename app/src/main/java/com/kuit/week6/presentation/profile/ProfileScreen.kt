@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 fun ProfileScreen(
     state: ProfileUiState,
     onIntent: (ProfileIntent) -> Unit,
+    onOpenProducts: () -> Unit,
 ) {
     LaunchedEffect(Unit) { onIntent(ProfileIntent.Load) }
 
@@ -33,6 +34,7 @@ fun ProfileScreen(
                 Text("@${u.username}", style = MaterialTheme.typography.bodyLarge)
                 Text(u.email, style = MaterialTheme.typography.bodyMedium)
             }
+            Button(onClick = onOpenProducts, modifier = Modifier.fillMaxWidth()) { Text("상품 보기") }
             Spacer(Modifier.height(8.dp))
             HorizontalDivider()
             Text("실습 확인", style = MaterialTheme.typography.titleMedium)

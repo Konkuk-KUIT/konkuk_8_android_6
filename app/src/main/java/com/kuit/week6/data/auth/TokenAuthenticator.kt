@@ -9,23 +9,30 @@ import okhttp3.Route
 import javax.inject.Inject
 import javax.inject.Provider
 
-// OkHttp 가 401 응답을 받았을 때만 호출한다.
-// 새 Request 를 돌려주면 그걸로 한 번 더 시도하고, null 을 돌려주면 401 을 그대로 앱에 넘긴다.
 class TokenAuthenticator @Inject constructor(
     private val tokenStore: TokenStore,
-    private val authService: Provider<AuthService>,   // Provider: OkHttp → Retrofit → AuthService 순환 의존을 끊는다
+    private val authService: Provider<AuthService>,
 ) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
-        // [TODO 3-a] 이미 재시도한 응답이면 포기 (무한 루프 방지)
-        //            힌트: response.priorResponse != null → return null
+        // [정답 3-a] 재시도한 요청이 또 401 이면 포기. 없으면 무한 루프.
+        if (response.priorResponse != null) return null
 
-        // [TODO 3-b] refreshToken 을 읽어 authService.get().refresh(...) 호출.
-        //            실패(예외)하면 tokenStore.clear() 후 return null  → 앱은 401 을 받고 로그아웃 처리
-        //            성공하면 tokenStore.save(새 access, 새 refresh)
+        // [정답 3-b] refresh 요청. Authenticator 도 suspend 가 아니라 runBlocking (OkHttp 스레드).
+        val refresh = runBlocking { tokenStore.refreshToken.first() } ?: return null
+        val new = runBlocking {
+            try { authService.get().refresh(RefreshRequest(refresh)) }
+            catch (e: Exception) { null }          // 403 Invalid refresh token, 네트워크 오류 → null
+        }
+        if (new == null) {
+            runBlocking { tokenStore.clear() }      // 둘 다 만료 → 로그아웃 상태. 앱은 401 을 받는다
+            return null
+        }
+        runBlocking { tokenStore.save(new.accessToken, new.refreshToken) }
 
-        // [TODO 3-c] 원래 요청에 새 토큰 헤더를 얹어 반환
-        //            response.request.newBuilder().header("Authorization", "Bearer $new").build()
-        return null
+        // [정답 3-c] 원래 요청을 새 토큰으로 한 번 더
+        return response.request.newBuilder()
+            .header("Authorization", "Bearer ${new.accessToken}")
+            .build()
     }
 }

@@ -6,18 +6,16 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
-// 요청이 나가기 직전에 한 번 호출된다. 여기서 헤더를 붙이면 모든 요청에 붙는다.
 class AuthInterceptor @Inject constructor(
     private val tokenStore: TokenStore,
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
-        // Interceptor 는 suspend 가 아니다. 이 자리에서만 runBlocking 을 허용한다 (OkHttp 스레드).
         val token = runBlocking { tokenStore.accessToken.first() }
 
-        // [TODO 2] token 이 null 이 아니면 "Authorization: Bearer <token>" 헤더를 붙인 새 요청으로 proceed.
-        //          null 이면 원래 요청 그대로 proceed. (로그인 · refresh 요청은 토큰 없이 나간다)
-        val request = chain.request()
+        // [정답 2] 토큰이 있을 때만 헤더를 얹는다. Request 는 불변이라 newBuilder 로 새로 만든다.
+        val request = if (token == null) chain.request()
+        else chain.request().newBuilder().header("Authorization", "Bearer $token").build()
         return chain.proceed(request)
     }
 }
