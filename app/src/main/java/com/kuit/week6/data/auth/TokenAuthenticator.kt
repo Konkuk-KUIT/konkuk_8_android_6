@@ -19,13 +19,25 @@ class TokenAuthenticator @Inject constructor(
     override fun authenticate(route: Route?, response: Response): Request? {
         // [TODO 3-a] 이미 재시도한 응답이면 포기 (무한 루프 방지)
         //            힌트: response.priorResponse != null → return null
+        if (response.priorResponse != null) return null
+
 
         // [TODO 3-b] refreshToken 을 읽어 authService.get().refresh(...) 호출.
         //            실패(예외)하면 tokenStore.clear() 후 return null  → 앱은 401 을 받고 로그아웃 처리
         //            성공하면 tokenStore.save(새 access, 새 refresh)
+        val refresh = runBlocking { tokenStore.refreshToken.first() } ?: return null
+        val res = try {
+            runBlocking { authService.get().refresh(RefreshRequest(refresh)) }
+        } catch (e: Exception) {
+            runBlocking { tokenStore.clear() }
+            return null
+        }
+        runBlocking { tokenStore.save(res.accessToken, res.refreshToken) }
 
         // [TODO 3-c] 원래 요청에 새 토큰 헤더를 얹어 반환
         //            response.request.newBuilder().header("Authorization", "Bearer $new").build()
-        return null
+        return response.request.newBuilder()
+            .header("Authorization", "Bearer ${res.accessToken}")
+            .build()
     }
 }

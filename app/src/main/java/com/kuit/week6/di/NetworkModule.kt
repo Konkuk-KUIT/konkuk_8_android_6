@@ -35,6 +35,8 @@ object NetworkModule {
         authInterceptor: AuthInterceptor,
         authenticator: TokenAuthenticator,
     ): OkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(authInterceptor)
+        .authenticator(authenticator)
         .addInterceptor(logging())
         .build()
 
