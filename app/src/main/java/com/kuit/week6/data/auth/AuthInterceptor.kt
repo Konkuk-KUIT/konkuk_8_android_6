@@ -18,6 +18,12 @@ class AuthInterceptor @Inject constructor(
         // [TODO 2] token 이 null 이 아니면 "Authorization: Bearer <token>" 헤더를 붙인 새 요청으로 proceed.
         //          null 이면 원래 요청 그대로 proceed. (로그인 · refresh 요청은 토큰 없이 나간다)
         val request = chain.request()
-        return chain.proceed(request)
+        if (token == null || request.url.encodedPath.endsWith("auth/refresh")) {
+            return chain.proceed(request)
+        }
+        val newRequest = request.newBuilder()
+            .header("Authorization", "Bearer $token")
+            .build()
+        return chain.proceed(newRequest)
     }
 }

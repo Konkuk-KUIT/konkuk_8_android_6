@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 fun ProfileScreen(
     state: ProfileUiState,
     onIntent: (ProfileIntent) -> Unit,
+    onOpenProducts: () -> Unit,
 ) {
     LaunchedEffect(Unit) { onIntent(ProfileIntent.Load) }
 
@@ -39,6 +40,7 @@ fun ProfileScreen(
             Text("① 토큰 망가뜨리기 → ② 새로고침. Logcat 에서 401 → POST /auth/refresh → GET /auth/me 200 순서를 확인.", style = MaterialTheme.typography.bodySmall)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(onClick = { onIntent(ProfileIntent.BreakToken) }) { Text("토큰 망가뜨리기") }
+                OutlinedButton(onClick = onOpenProducts) { Text("상품 보기") }
                 OutlinedButton(onClick = { onIntent(ProfileIntent.Logout) }) { Text("로그아웃") }
             }
             state.lastEvent?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
